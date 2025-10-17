@@ -1,0 +1,35 @@
+{
+    "admin": {
+        "email": "admin@school.edu",
+        "password": "AdminPass123!",
+        "name": "Site Admin",
+        "school": "Platform HQ",
+        "student_id": "ADM0001"
+    },
+    "students": [
+        {
+            "email": "alice.student@university.edu",
+            "password": "alicepass",
+            "name": "Alice Student",
+            "school": "University A",
+            "student_id": "U10001",
+            "is_verified": false
+        },
+        {
+            "email": "bob.learner@college.edu",
+            "password": "bobpass",
+            "name": "Bob Learner",
+            "school": "College B",
+            "student_id": "C20022",
+            "is_verified": false
+        },
+        {
+            "email": "carol.student@uni.edu",
+            "password": "carolpass",
+            "name": "Carol Student",
+            "school": "University C",
+            "student_id": "U30033",
+            "is_verified": true
+        }
+    ]
+}
