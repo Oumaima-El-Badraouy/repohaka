@@ -24,6 +24,7 @@ const Navbar = () => {
     ] : []),
     ...(isAuthenticated() && user?.role === 'admin' ? [
       { name: 'Admin Panel', href: '/admin', current: location.pathname === '/admin' },
+      { name: 'Profile', href: '/admin/profile', current: location.pathname === '/admin/profile' }
     ] : []),
   ];
 

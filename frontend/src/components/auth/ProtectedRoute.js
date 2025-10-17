@@ -21,7 +21,7 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   if (requiredRole && user?.role !== requiredRole) {
     // Redirect based on user role
     if (user?.role === 'admin') {
-      return <Navigate to="/admin" replace />;
+      return <Navigate to="/admin/profile" replace />;
     } else if (user?.role === 'student') {
       return <Navigate to="/dashboard" replace />;
     } else {

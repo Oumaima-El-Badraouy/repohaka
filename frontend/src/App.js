@@ -112,7 +112,7 @@ function App() {
                   
                   {/* Protected Admin Routes */}
                   <Route
-                    path="/admin"
+                    path="/admin/profile"
                     element={
                       <ProtectedRoute requiredRole="admin">
                         <ProfilePageAdmin />
