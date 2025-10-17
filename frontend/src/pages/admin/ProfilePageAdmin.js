@@ -26,7 +26,7 @@ const ProfilePageAdmin = () => {
 
   const handleUpdate = async () => {
     try {
-      const res = await axios.put('http://localhost:5000/api/admin/me/update', form);
+      const res = await axios.put('http://localhost:5000/api/admin/update', form);
       setUser(res.data.user);
       setIsEditing(false);
       alert('Profile updated successfully!');
