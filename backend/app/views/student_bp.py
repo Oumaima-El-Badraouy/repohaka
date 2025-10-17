@@ -225,3 +225,32 @@ def get_available_subjects():
             'success': False,
             'message': f'Failed to get subjects: {str(e)}'
         }), 500
+
+@student_bp.route('/update', methods=['PUT'])
+@require_verified_student
+@validate_json(required_fields=['name', 'email', 'school'])
+@log_user_action('update_student_profile')
+def update_student_profile():
+    """Update student profile (name, email, school)."""
+    try:
+        current_user = jwt_current_user()
+        user_id = current_user.get('user_id') if current_user else None
+
+        if not user_id:
+            return jsonify({
+                'success': False,
+                'message': 'Unauthorized'
+            }), 401
+
+        data = g.json_data
+        from app.controllers.student_controller import StudentController
+        result = StudentController.update_profile(user_id, data)
+
+        status_code = 200 if result['success'] else 400
+        return jsonify(result), status_code
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Failed to update student profile: {str(e)}'
+        }), 500

@@ -20,6 +20,8 @@ import ChatPage from './pages/student/ChatPage';
 import TutorsPage from './pages/student/TutorsPage';
 import ProfilePage from './pages/student/ProfilePage';
 import ProfilePageAdmin from './pages/admin/ProfilePageAdmin';
+import PendingStudentsPage from './pages/admin/PendingStudentsPage';
+import AddTutorPage from './pages/admin/AddTutorPage';
 // Error Boundary
 import ErrorBoundary from './components/common/ErrorBoundary';
 
@@ -116,6 +118,22 @@ function App() {
                     element={
                       <ProtectedRoute requiredRole="admin">
                         <ProfilePageAdmin />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/pending-students"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <PendingStudentsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/add-tutor"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AddTutorPage />
                       </ProtectedRoute>
                     }
                   />

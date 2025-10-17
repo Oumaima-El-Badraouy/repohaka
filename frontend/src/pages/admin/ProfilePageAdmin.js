@@ -8,7 +8,7 @@ const ProfilePageAdmin = () => {
   const [form, setForm] = useState({ name: '', email: '', school: '' });
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/auth/me')
+    axios.get('/auth/me')
       .then(res => {
         setUser(res.data.user);
         setForm({
@@ -26,7 +26,7 @@ const ProfilePageAdmin = () => {
 
   const handleUpdate = async () => {
     try {
-      const res = await axios.put('http://localhost:5000/api/admin/update', form);
+      const res = await axios.put('/admin/update', form);
       setUser(res.data.user);
       setIsEditing(false);
       alert('Profile updated successfully!');

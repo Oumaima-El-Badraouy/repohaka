@@ -80,7 +80,7 @@ def create_app(config_name=None):
     )
     
     # Enable CORS
-    CORS(app, origins=app.config['CORS_ORIGINS'])
+    CORS(app, supports_credentials=True)
     
     # Register blueprints
     from app.views.auth_bp import auth_bp

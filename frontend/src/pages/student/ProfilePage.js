@@ -1,10 +1,63 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { UserIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 
 const ProfilePage = () => {
   const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [edit, setEdit] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', school: '' });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const res = await axios.get('/students/me'); // <-- removed /api
+      if (res.data.success) {
+        setProfile(res.data.profile || res.data.user); // support both keys
+        setForm({
+          name: res.data.profile?.name || res.data.user?.name || '',
+          email: res.data.profile?.email || res.data.user?.email || '',
+          school: res.data.profile?.school || res.data.user?.school || '',
+        });
+      }
+    } catch (err) {
+      toast.error('Failed to load profile');
+    }
+  };
+
+  const handleChange = e => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async e => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await axios.put('/students/update', form); // <-- removed /api
+      if (res.data.success) {
+        toast.success('Profile updated!');
+        setProfile(res.data.user);
+        setEdit(false);
+      } else {
+        toast.error(res.data.message || 'Update failed');
+      }
+    } catch (err) {
+      toast.error('Update failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!profile) {
+    return <div className="p-8 text-center">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen pt-16 pb-8">
@@ -30,53 +83,76 @@ const ProfilePage = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">School</label>
-                    <p className="text-gray-900">{user?.school}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Student ID</label>
-                    <p className="text-gray-900">{user?.student_id}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Verification Status</label>
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      user?.is_verified 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {user?.is_verified ? 'Verified' : 'Pending Verification'}
-                    </span>
-                  </div>
+            {edit ? (
+              <form onSubmit={handleSave} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Name</label>
+                  <input
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    required
+                    className="form-control w-full"
+                  />
                 </div>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Learning Stats</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Member Since</label>
-                    <p className="text-gray-900">
-                      {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">Last Login</label>
-                    <p className="text-gray-900">
-                      {user?.last_login ? new Date(user.last_login).toLocaleDateString() : 'First time'}
-                    </p>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Email</label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    className="form-control w-full"
+                  />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">School</label>
+                  <input
+                    name="school"
+                    value={form.school}
+                    onChange={handleChange}
+                    required
+                    className="form-control w-full"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn-primary px-6 py-2"
+                  >
+                    {loading ? 'Saving...' : 'Save'}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secondary px-6 py-2"
+                    onClick={() => setEdit(false)}
+                    disabled={loading}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <span className="font-medium">Name:</span> {profile.name}
+                </div>
+                <div>
+                  <span className="font-medium">Email:</span> {profile.email}
+                </div>
+                <div>
+                  <span className="font-medium">School:</span> {profile.school}
+                </div>
+                <button
+                  className="btn-primary mt-4 px-6 py-2"
+                  onClick={() => setEdit(true)}
+                >
+                  Edit Profile
+                </button>
               </div>
-            </div>
-            
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <button className="btn-primary">Edit Profile</button>
-            </div>
+            )}
           </div>
         </motion.div>
       </div>

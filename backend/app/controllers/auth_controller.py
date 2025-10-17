@@ -128,7 +128,11 @@ class AuthController:
             # Create tokens
             # Use string identity for 'sub' and store other info as additional claims
             uid_str = str(user_data['_id'])
-            additional = {'email': user_data['email'], 'role': user_data['role']}
+            additional = {
+                'user_id': uid_str,  # <-- add this line
+                'email': user_data['email'],
+                'role': user_data['role']
+            }
 
             access_token = create_access_token(identity=uid_str, additional_claims=additional)
             refresh_token = create_refresh_token(identity=uid_str, additional_claims=additional)

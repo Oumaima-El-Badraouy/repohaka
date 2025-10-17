@@ -15,33 +15,60 @@ class AdminController:
     def get_pending_students() -> dict:
         """Get students pending verification."""
         try:
-            students = User.find_all_students(verified_only=False)
-            pending_students = [s for s in students if not s['is_verified']]
+            # Find all users with role='student' and is_verified=False
+            pending_students = list(mongo.db.users.find(
+                {
+                    'role': 'student',
+                    'is_verified': False
+                },
+                {
+                    'password': 0  # Exclude password field
+                }
+            ))
 
-            student_list = [{
-                'id': str(s['_id']),
-                'name': s['name'],
-                'email': s['email'],
-                'school': s['school'],
-                'student_id': s['student_id'],
-                'created_at': s['created_at']
-            } for s in pending_students]
+            # Convert ObjectId to string for JSON serialization
+            for student in pending_students:
+                student['_id'] = str(student['_id'])
 
-            return {'success': True, 'students': student_list}
-
+            return {
+                'success': True,
+                'students': pending_students
+            }
         except Exception as e:
-            return {'success': False, 'message': f'Failed to get pending students: {str(e)}'}
+            return {
+                'success': False,
+                'message': str(e)
+            }
 
     @staticmethod
     def verify_student(student_id: str) -> dict:
         """Verify a student account."""
         try:
-            success = User.verify_student(student_id)
-            if success:
-                return {'success': True, 'message': 'Student verified successfully'}
-            return {'success': False, 'message': 'Student not found or already verified'}
+            result = mongo.db.users.update_one(
+                {
+                    '_id': ObjectId(student_id),
+                    'role': 'student'
+                },
+                {
+                    '$set': {'is_verified': True}
+                }
+            )
+
+            if result.modified_count > 0:
+                return {
+                    'success': True,
+                    'message': 'Student verified successfully'
+                }
+            else:
+                return {
+                    'success': False,
+                    'message': 'Student not found or already verified'
+                }
         except Exception as e:
-            return {'success': False, 'message': f'Failed to verify student: {str(e)}'}
+            return {
+                'success': False,
+                'message': str(e)
+            }
 
     @staticmethod
     def get_profile(admin_id: str) -> dict:
